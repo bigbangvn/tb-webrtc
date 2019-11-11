@@ -9,6 +9,7 @@
  */
 
 #import <Foundation/Foundation.h>
+#import <CoreAudioTypes/CoreAudioBaseTypes.h>
 
 #import "RTCMacros.h"
 
@@ -27,6 +28,8 @@ NS_ASSUME_NONNULL_BEGIN
 @protocol RTCVideoDecoderFactory;
 @protocol RTCVideoEncoderFactory;
 
+typedef void (^RTCTBAudioHookBlock)(AudioBufferList *);
+
 RTC_OBJC_EXPORT
 @interface RTCPeerConnectionFactory : NSObject
 
@@ -36,6 +39,10 @@ RTC_OBJC_EXPORT
 /* Initialize object with injectable video encoder/decoder factories */
 - (instancetype)initWithEncoderFactory:(nullable id<RTCVideoEncoderFactory>)encoderFactory
                         decoderFactory:(nullable id<RTCVideoDecoderFactory>)decoderFactory;
+
+- (instancetype)initWithEncoderFactory:(nullable id<RTCVideoEncoderFactory>)encoderFactory
+                        decoderFactory:(nullable id<RTCVideoDecoderFactory>)decoderFactory
+                        audioCallback:(RTCTBAudioHookBlock)audioCallback;
 
 /** Initialize an RTCAudioSource with constraints. */
 - (RTCAudioSource *)audioSourceWithConstraints:(nullable RTCMediaConstraints *)constraints;

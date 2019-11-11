@@ -47,8 +47,10 @@ class AudioDeviceIOS : public AudioDeviceGeneric,
                        public AudioSessionObserver,
                        public VoiceProcessingAudioUnitObserver,
                        public rtc::MessageHandler {
+ private:
+    void (*audioHookCallback_)(void *);
  public:
-  AudioDeviceIOS();
+  AudioDeviceIOS(void (*audioHookCallback)(void *) = nullptr);
   ~AudioDeviceIOS() override;
 
   void AttachAudioBuffer(AudioDeviceBuffer* audioBuffer) override;
