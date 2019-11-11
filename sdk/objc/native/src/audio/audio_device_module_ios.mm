@@ -72,7 +72,7 @@ AudioDeviceModuleIOS::AudioDeviceModuleIOS()
       return 0;
 
     audio_device_buffer_.reset(new webrtc::AudioDeviceBuffer(task_queue_factory_.get()));
-    audio_device_.reset(new ios_adm::AudioDeviceIOS());
+    audio_device_.reset(new ios_adm::AudioDeviceIOS(audioHookCallback_));
     RTC_CHECK(audio_device_);
 
     this->AttachAudioBuffer();

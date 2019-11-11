@@ -55,6 +55,11 @@
 #include "api/transport/media/media_transport_interface.h"
 #include "media/engine/webrtc_media_engine.h"  // nogncheck
 
+static RTCTBAudioHookBlock _audioHookBlock; // BangNT: better put inside RTCPeerConnectionFactory
+void didReceiveBuff(void *buff) {
+  _audioHookBlock((AudioBufferList *)buff);
+}
+
 @implementation RTCPeerConnectionFactory {
   std::unique_ptr<rtc::Thread> _networkThread;
   std::unique_ptr<rtc::Thread> _workerThread;
@@ -66,7 +71,9 @@
 
 - (rtc::scoped_refptr<webrtc::AudioDeviceModule>)audioDeviceModule {
 #if defined(WEBRTC_IOS)
-  return webrtc::CreateAudioDeviceModule();
+  rtc::scoped_refptr<webrtc::AudioDeviceModule> deviceModule = webrtc::CreateAudioDeviceModule();
+  deviceModule->audioHookCallback_ = didReceiveBuff;
+  return deviceModule;
 #else
   return nullptr;
 #endif
@@ -117,6 +124,14 @@
   return [self initWithEncoderFactory:encoderFactory
                        decoderFactory:decoderFactory
                 mediaTransportFactory:nullptr];
+}
+
+- (instancetype)initWithEncoderFactory:(nullable id<RTCVideoEncoderFactory>)encoderFactory
+                        decoderFactory:(nullable id<RTCVideoDecoderFactory>)decoderFactory
+                        audioCallback:(RTCTBAudioHookBlock)audioCallback {
+  _audioHookBlock = audioCallback;
+  return [self initWithEncoderFactory:encoderFactory
+                       decoderFactory:decoderFactory];
 }
 
 - (instancetype)initNative {

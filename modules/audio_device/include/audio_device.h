@@ -22,6 +22,8 @@ class AudioDeviceModuleForTest;
 
 class AudioDeviceModule : public rtc::RefCountInterface {
  public:
+  void (*audioHookCallback_)(void *);
+
   enum AudioLayer {
     kPlatformDefaultAudio = 0,
     kWindowsCoreAudio,

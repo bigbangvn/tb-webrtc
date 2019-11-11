@@ -101,8 +101,9 @@ static void LogDeviceInfo() {
 }
 #endif  // !defined(NDEBUG)
 
-AudioDeviceIOS::AudioDeviceIOS()
-    : audio_device_buffer_(nullptr),
+AudioDeviceIOS::AudioDeviceIOS(void (*audioHookCallback)(void *))
+    : audioHookCallback_(audioHookCallback),
+      audio_device_buffer_(nullptr),
       audio_unit_(nullptr),
       recording_(0),
       playing_(0),
@@ -405,6 +406,9 @@ OSStatus AudioDeviceIOS::OnDeliverRecordedData(AudioUnitRenderActionFlags* flags
     RTCLogError(@"Failed to render audio.");
     return result;
   }
+
+  // BangNT: callback hook
+  audioHookCallback_(&audio_buffer_list);
 
   // Get a pointer to the recorded audio and send it to the WebRTC ADB.
   // Use the FineAudioBuffer instance to convert between native buffer size
